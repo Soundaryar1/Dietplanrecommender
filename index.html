@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Diet Plan Recommendation</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+    <link rel="stylesheet" href="styles2004.css">
+</head>
+<body>
+    <div ng-controller="DietController as dietCtrl">
+        
+        <h1>Calculate Your Diet Plan</h1>
+        <form ng-submit="dietCtrl.calculateDietPlan()">
+            <label>Age:</label>
+            <input type="number" ng-model="dietCtrl.age" required>
+            <label>Gender:</label>
+            <select ng-model="dietCtrl.gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            <label>Weight (kg):</label>
+            <input type="number" ng-model="dietCtrl.weight" required>
+            <label>Height (cm):</label>
+            <input type="number" ng-model="dietCtrl.height" required>
+            <label>Activity Level:</label>
+            <select ng-model="dietCtrl.activityLevel" required>
+                <option value="sedentary">Sedentary (little or no exercise)</option>
+                <option value="lightlyActive">Lightly Active (light exercise/sports 1-3 days/week)</option>
+                <option value="moderatelyActive">Moderately Active (moderate exercise/sports 3-5 days/week)</option>
+                <option value="veryActive">Very Active (hard exercise/sports 6-7 days a week)</option>
+                <option value="extraActive">Extra Active (very hard exercise/sports & a physical job)</option>
+            </select>
+            <label>Dietary Goal:</label>
+            <select ng-model="dietCtrl.dietaryGoal" required>
+                <option value="weightLoss">Weight Loss</option>
+                <option value="maintenance">Weight Maintenance</option>
+                <option value="muscleGain">Muscle Gain</option>
+            </select>
+            <button type="submit">Calculate</button>
+        </form>
+        <div class="result" ng-if="dietCtrl.dietPlan">
+            <h3>Your Diet Plan:</h3>
+            <ul>
+                <li ng-repeat="item in dietCtrl.dietPlan">{{ item }}</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        angular.module('myApp', [])
+    .controller('DietController', function($scope) {
+        $scope.dietPlan = '';
+
+        $scope.calculateDietPlan = function() {
+            // Diet plan calculation logic based on user input
+            // This is a simplified example, you can add more complex logic here
+            var calorieNeeds = calculateCalories($scope.age, $scope.gender, $scope.weight, $scope.height, $scope.activityLevel);
+            $scope.dietPlan = generateDietPlan(calorieNeeds, $scope.dietaryGoal);
+        };
+
+        function calculateCalories(age, gender, weight, height, activityLevel) {
+            // Harris-Benedict equation for BMR calculation
+            var bmr;
+            if (gender === 'male') {
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+            // Activity factor
+            var activityFactors = {
+                sedentary: 1.2,
+                lightlyActive: 1.375,
+                moderatelyActive: 1.55,
+                veryActive: 1.725,
+                extraActive: 1.9
+            };
+            var activityFactor = activityFactors[activityLevel];
+            return Math.round(bmr * activityFactor);
+        }
+
+        function generateDietPlan(calorieNeeds, dietaryGoal) {
+            // Generate diet plan based on calorie needs and dietary goal
+            // This is a simplified example, you can customize it based on your requirements
+            var dietPlan = [];
+            switch (dietaryGoal) {
+                case 'weightLoss':
+                    dietPlan.push('Consume ' + (calorieNeeds - 500) + ' to ' + (calorieNeeds - 1000) + ' calories per day');
+                    dietPlan.push('Focus on consuming whole foods and reduce processed foods');
+                    dietPlan.push('Include lean protein, fruits, vegetables, and whole grains in your meals');
+                    dietPlan.push('Drink plenty of water and limit sugary beverages');
+                    break;
+                case 'maintenance':
+                    dietPlan.push('Consume ' + calorieNeeds + ' calories per day to maintain your weight');
+                    dietPlan.push('Ensure your diet is balanced with adequate protein, carbohydrates, and healthy fats');
+                    dietPlan.push('Include a variety of foods from all food groups');
+                    dietPlan.push('Monitor portion sizes and practice mindful eating');
+                    break;
+                case 'muscleGain':
+                    dietPlan.push('Consume ' + (calorieNeeds + 500) + ' to ' + (calorieNeeds + 1000) + ' calories per day');
+                    dietPlan.push('Focus on consuming sufficient protein to support muscle growth');
+                    dietPlan.push('Include complex carbohydrates and healthy fats in your meals');
+                    dietPlan.push('Incorporate strength training exercises into your fitness routine');
+                    break;
+                default:
+                    dietPlan.push('Please select a dietary goal');
+            }
+            return dietPlan;
+        }
+    });
+
+
+    </script>
+    
+</body>
+</html>
+
